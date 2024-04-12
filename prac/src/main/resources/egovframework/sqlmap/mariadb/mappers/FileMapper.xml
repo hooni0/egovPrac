@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.example.table.service.impl.FileMapper">
+
+	<resultMap type="egovframework.example.table.service.FileVO" id="File">
+		<id column="CARD_ID" property="cardId"></id>
+		<result column="FILE_NO" property="fileNo"></result>
+		<result column="FILE_NM" property="fileNm"></result>
+		<result column="FILE_CNTN" property="fileCntn"></result>
+		<result column="FILE_SIZE" property="fileSize"></result>
+		<result column="DEL_AT" property="delAt"></result>
+		<result column="REG_ID" property="regId"></result>
+		<result column="REG_DATE" property="regDate"></result>
+	</resultMap>
+	
+	<select id="selectFileInfo" resultMap="File" parameterType="map">
+		
+		SELECT
+			*
+		FROM
+			file
+		WHERE
+			FILE_NO = #{fileNo} AND CARD_ID = #{cardId}
+		
+	</select>
+	
+	<insert id="fileInsert" parameterType="map">
+		<selectKey keyProperty="maxNo" keyColumn="newMaxNo" resultType="String" order="BEFORE">
+			SELECT
+				CASE 
+					WHEN COUNT(*) = 0
+						then 1
+					ELSE
+						MAX(FILE_NO)+1
+				END as newMaxNo
+			FROM
+				FILE
+			WHERE 
+				CARD_ID = #{cardId}
+		</selectKey>
+		INSERT INTO file
+			(CARD_ID, FILE_NO, FILE_NM, FILE_CNTN, FILE_SIZE, DEL_AT, REG_ID, REG_DATE)
+		VALUES
+			(#{cardId}, #{maxNo}, #{fileName}, #{file}, #{fileSize}, 'O', 'test', now())
+	</insert>
+
+	<select id="fileList" resultMap="File" parameterType="int">
+		SELECT 
+			*
+		FROM
+			FILE as f
+			inner join
+			C_CARD_NEWS as ccn
+			on
+			f.CARD_ID = ccn.ID
+		WHERE 
+			f.CARD_ID = #{cardId};
+	</select>
+	
+</mapper>

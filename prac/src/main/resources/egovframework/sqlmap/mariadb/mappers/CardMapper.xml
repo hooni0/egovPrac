@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.example.table.service.impl.CardMapper">
+
+	<resultMap type="egovframework.example.table.service.CardVO" id="Card">
+		<id column="id" property="cardId"></id>
+		<result column="hash_tags" property="hashTags"></result>
+		<result column="thumb_nail" property="thumbNail"></result>
+		<result column="title" property="cardTitle"></result>
+		<result column="create_date" property="date"></result>
+	</resultMap>
+	
+	<select id="getCardCnt" resultType="int" parameterType="map">
+		SELECT COUNT(*)
+		FROM 
+			C_CARD_NEWS
+		<if test="searchValue != null and searchValue != ''">
+		WHERE
+			${searchKey} LIKE CONCAT('%', #{searchValue}, '%')
+		</if>
+	</select>
+	
+	<insert id="cardInsert" parameterType="CardVO">
+		<selectKey keyProperty="cardId" resultType="String" order="BEFORE">
+			SELECT
+				MAX(id) + 1
+			FROM
+				C_CARD_NEWS
+		</selectKey>
+		INSERT INTO C_CARD_NEWS
+			(id, HASH_TAGS, THUMB_NAIL, TITLE, CREATE_DATE)
+		VALUES
+			(#{cardId}, #{hashTags}, #{thumbNail}, #{cardTitle}, now())
+	</insert>
+	
+	<delete id="cardDelete" parameterType="CardVO">
+		DELETE
+		FROM 
+			C_CARD_NEWS
+		WHERE
+			id=#{cardId}
+	</delete>
+	
+	<update id="cardUpdate" parameterType="CardVO">
+		update c_card_news
+		set
+			id=#{cardId},
+			hash_tags=#{hashTags},
+			thumb_nail=#{thumbNail},
+			title=#{cardTitle},
+			create_date=#{date}
+		where
+			id=#{cardId}
+	</update>
+	
+	<select id="cardUpdateList" parameterType="String" resultMap="Card">
+		
+		select
+			id, hash_tags, thumb_nail, title, create_date
+		from 
+			c_card_news
+		where
+			id=#{cardId}
+		
+	</select>
+	
+	<select id="selectCardList" parameterType="map" resultMap="Card">
+	
+		SELECT 
+			ID, HASH_TAGS, THUMB_NAIL, TITLE, CREATE_DATE
+		FROM 
+			C_CARD_NEWS
+		<if test="searchValue != null and searchValue != ''">
+			WHERE
+				${searchKey} LIKE CONCAT('%', #{searchValue}, '%')
+		</if>
+		ORDER BY CREATE_DATE DESC 
+		<if test="startIdx != null and startIdx > -1">
+			LIMIT #{startIdx}, #{rowPerPage}
+		</if>
+
+	</select>
+
+</mapper>

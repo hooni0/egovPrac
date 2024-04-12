@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.example.table.service.impl.TableMapper">
+
+	<resultMap id="Table" type="egovframework.example.table.service.TableVO">
+		<result property="companyId" column="company_id"></result>
+		<result property="companyName" column="name"></result>
+		<result property="companyBranch" column="branch"></result>
+		<result property="companyAddr" column="address"></result>
+		<result property="companyEmail" column="email"></result>
+		<result property="companyMemo" column="memo"></result>
+	</resultMap>
+
+	<select id="selectCompanyList" resultMap="Table">
+		select
+			c.company_id,
+			c.name,
+			c.branch,
+			c.address,
+			c.email,
+			c.memo
+		from
+			company as c
+	</select>
+
+ 	<select id="companyList" parameterType="searchVO" resultMap="Table">
+		select
+			c.company_id,
+			c.name,
+			c.branch,
+			c.address,
+			c.email,
+			c.memo
+		from
+			company as c
+		WHERE 1=1
+		ORDER BY c.company_id ASC
+		LIMIT #{firstIndex}, #{recordCountPerPage}
+		<!-- LIMIT 1, 5 -->
+	</select>
+
+ 	<select id="companyListTotCnt" parameterType="searchVO" resultType="int">
+		select
+			count(*) totcnt
+		from
+			company
+	</select>
+ 
+</mapper>
